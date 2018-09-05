@@ -7,12 +7,24 @@
 //
 
 import UIKit
+import MapKit
 
 class ViewController: UIViewController {
 
+    @IBOutlet weak var mapView: MKMapView!
+    @IBOutlet weak var positionLabel: UILabel!
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
+        NotificationCenter.default.addObserver(forName: NSNotification.Name.deviceLocationUpdated, object: nil, queue: OperationQueue.main) { (notication) in
+            guard let position = notication.userInfo?[DevicePositionUpdateInfo] as? CLLocation else{
+                return
+            }
+            self.positionLabel.text = "\(position)"
+            
+        }
     }
 
     override func didReceiveMemoryWarning() {

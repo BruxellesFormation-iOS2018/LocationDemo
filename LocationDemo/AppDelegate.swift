@@ -7,15 +7,22 @@
 //
 
 import UIKit
+import CoreLocation
 
 @UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate {
+class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate {
 
     var window: UIWindow?
-
-
+    let locationManager =  CLLocationManager()
+    
+    
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
+        locationManager.requestWhenInUseAuthorization()
+        locationManager.requestAlwaysAuthorization()
+        locationManager.delegate = self
+        locationManager.startUpdatingLocation()
+        
         return true
     }
 
@@ -41,6 +48,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
 
-
+    
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        guard let currentLocation = locations.first else{
+            return
+        }
+        
+        NotificationCenter.default.post(name: NSNotification.Name.deviceLocationUpdated, object: nil, userInfo: [DevicePositionUpdateInfo: currentLocation])
+    }
 }
 
+let DevicePositionUpdateInfo = "position_update"
+extension NSNotification.Name {
+    static let deviceLocationUpdated = Notification.Name("be.underside.DeviceLocationUpdatedNotification")
+}
